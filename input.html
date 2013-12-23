@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+ <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+<meta charset="utf-8">
+<title>Aspiring Mind Coding Task</title>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<script src="js/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<body>
+<div class="container">
+	<div class="jumbotron">
+		<h1>Internal Tool for Content Provider</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div id="form" class="col-xs-offset-4 col-xs-4 col-xs-offset-4">
+                <form method="post" action="backend.php" role="form">
+                    <div class="form-group">
+                        <label for="LanguageChoice">
+                            Language:
+                        </label>
+                        <select name="language" required>
+                            <option value="default">Select Language
+                            </option>
+                            <option value="c">C
+                            </option>
+                            <option value="java">JAVA
+                            </option>
+                        </select> 
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+	</div>
+</div>
+</body>
+</html>
