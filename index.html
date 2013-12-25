@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+ <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+<meta charset="utf-8">
+<title>Aspiring Mind Coding Task</title>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<script src="js/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script><body>
+<div class="container">
+	<div class="jumbotron">
+		<h1>Internal Tool for Content Provider</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+        	<div class="col-xs-3" id="c-codediv" style="display:none;">
+            	<div style="border:rgba(0,0,0,1) thin ridge;">
+                  <h4>C Code</h4><hr>    
+                  	<p id='c-code'>                
+                    <p><p>#include &lt;stdio.h&gt;</p>
+                    <p>int <span id='c_code_functionName'>sort</span>(<span id='c_code_parameters'>int* arr, int n</span>){</p>
+                    <p>     // write your code here</p>
+                    <p>}</p></p>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <form method="post" action="backend.php" role="form" name="inputForm">
+                    <div class="form-group">
+                        <label for="LanguageChoice">
+                            Language:
+                        </label>
+                        <!--<select name="language" required  onChange="onSelect()" class="form-control" >
+                            <option value="default" disabled>Select Language
+                            </option>
+                            <option value="c" selected>C
+                            </option>
+                            <option value="java">JAVA
+                            </option>
+                        </select> -->
+                        <div class="checkbox">
+                              <input type="checkbox" name="c_language" value="c" checked onChange="onSelect(this)">C<br>
+                              <input type="checkbox" name="java_language" value="java" checked  onChange="onSelect(this)">JAVA
+                         </div>
+                    </div>
+                    <div class="form-group" id="functionName">
+                        <label for="functionNamelabel">Function Name:</label>
+                        <input type="text" class="form-control" name="functionName" id="functionNameInput" placeholder="Enter Function Name (sort)" required onChange="changeFunctionName(this)">
+					</div>
+                    <div class="form-group" id="className">
+                        <label for="classNamelabel">Class Name:</label>
+                        <input type="text" class="form-control" name="className"  placeholder="Enter Class Name (Sort)" id='classNameInput' onChange="changeClassName(this)">
+					</div>
+                    <div class="form-group" id="numArg">
+                        <label for="numArglabel">Number of Input Arguments:</label>
+                        <input type="text" class="form-control" name="numArg" placeholder="Enter Number of Input Arguments(1)" required onChange="addVariables(this)">
+					</div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+			<div class="col-xs-3" id="java-codediv" style="display:none;">
+				<div style="border:rgba(0,0,0,1) thin ridge;">
+                    <h4>JAVA Code</h4><hr>
+                    
+                  <p>public class <span id='java_code_className'>Sort</span></p>
+                    <p>  public int <span id='java_code_functionName'>sort</span>(<span id='java_code_parameters'>ArrayList arr</span>){</p>
+                    <p>     // write your code here</p>
+                    <p>  }<br>
+                      }</p>
+            	</div>
+			</div>
+	</div>
+</div>
+<div id="varInfo"></div>
+</body>
+</html>
