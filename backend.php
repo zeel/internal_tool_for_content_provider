@@ -17,5 +17,6 @@ if($language=='c')
 else if($language=='java')
 {
 	$className=$_POST['className'];
+	
 }
 ?>
