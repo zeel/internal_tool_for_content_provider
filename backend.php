@@ -1,23 +1,32 @@
 <?php
+header('Content-Type: application/json');
 $language=json_decode($_POST['language']);
-/*$num_var=$_POST['numArg'];
-$variables=$_POST['var_name'];
-$type=$_POST['type'];
+@$className=$_POST['className'];
 $functionName=$_POST['functionName'];
-$dim=$_POST['dim'];
-if($language=='c')
+$functionReturnType=$_POST['functionReturnType'];
+$file = 'db.json';
+$string = file_get_contents("db.json") or die('Could not read database!');
+$php_array=json_decode($string,true);
+$i=0;
+$j=0;
+$result=array();
+for($i;$i<count($php_array['language']);$i++)
 {
-	$i=0;
-	for($i=0;$i<$num_var;$i++)
+	if($php_array['language'][$i]['name']==$language[$j])
 	{
-		echo $type[$i].' '.$variables[$i].', ';
+		$variables=json_decode($_POST[$language[$i].'variables']);
+		$variable_string=implode(", ", $variables);
+		$fuctionSignature=$php_array['language'][$i]['fuctionSignature'];
+		$fuctionSignature = str_replace("functionName", $functionName, $fuctionSignature);
+		$fuctionSignature = str_replace("functionReturnType", $functionReturnType, $fuctionSignature);
 		
+		$fuctionSignature = str_replace("variables", $variable_string, $fuctionSignature);	
+		if(!is_null($className))
+		$fuctionSignature = str_replace("className", $className, $fuctionSignature);
+		$result[$j]=$fuctionSignature;		
+		$j++;
 	}
 }
-else if($language=='java')
-{
-	$className=$_POST['className'];
-	
-}*/
-echo count($language).' '.$language[0].' '.$language[1];
+echo json_encode($result);
+
 ?>

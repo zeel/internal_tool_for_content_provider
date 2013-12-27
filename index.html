@@ -16,7 +16,7 @@
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript">
 var javascript;
-var k=0;
+window.current=0;
 var maximum=0;
 window.onload=function()
 {
@@ -117,23 +117,14 @@ function checkCompulsory()
 }
 function closeModal()
 {
-	$('#varDetails'+k).modal('hide');
-	k++;
-	if(k<maximum)
+	$('#varDetails'+window.current).modal('hide');
+	window.current++;
+	if(window.current<maximum)
 	{
-		$('#varDetails'+k).modal('show');
+		$('#varDetails'+window.current).modal('show');
 	}
-	else if(k==(maximum))
+	else if(window.current==(maximum))
 	{
-		var xmlhttp;
-		if (window.XMLHttpRequest)
-		{// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp=new XMLHttpRequest();
-		}
-		else
-		{// code for IE6, IE5
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		}
 		var  language=document.getElementsByName("language[]");
 		var len=language.length;
 		var i=0,j=0;
@@ -148,35 +139,59 @@ function closeModal()
 			}
 		}
 		var noLanguageChecked=checkedLanguage.length;
-		var suggestionsArray=new Array();
+		var suggestionsArray='';
 		for(i=0;i<noLanguageChecked;i++)
 		{
-			var temp=document.getElementsByName(checkedLanguage[i]+'CodeSuggestionVariable');
-			var suggestion=new Array();
-			for(j=0;j<temp.length;j++)
+			var temp=new Array();
+			for(j=0;j<maximum;j++)
 			{
-				suggestion[j]=temp[j].value;
-				alert(temp[j].value);
-			}
-			
-			suggestionsArray[checkedLanguage[i]]=suggestion;			
+				temp[j]=document.getElementById(checkedLanguage[i]+'CodeSuggestionVariable'+j).value;
+			}			
+			suggestionsArray=suggestionsArray+'&'+checkedLanguage[i]+'variables='+JSON.stringify(temp);			
 		}
-		var functionName=document.getElementById(functionNameInput).value;
+		var functionName=document.getElementById('functionNameInput').value;
+		var functionReturnType=document.getElementById('functionReturnType').value;
 		//here for java i am checking if classname exists or not so using hardcoded values
-		classNameInput
-		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName;
+		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType;// parametes passed to php files. variables are passed in array of array form.
+		if(document.getElementById('checkbox_JAVA').checked==true)params=params+'&className='+document.getElementById('classNameInput').value;		
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
 		xmlhttp.open("POST","backend.php",true);
 		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xmlhttp.setRequestHeader("Content-length", params.length);
 		xmlhttp.setRequestHeader("Connection", "close");
 		xmlhttp.onreadystatechange = function()
-			{//Call a function when the state changes.
-				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					alert(xmlhttp.responseText);
+			{
+				//Call a function when the state changes.
+				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) 
+				{
+					var result=JSON.parse(xmlhttp.responseText)
+					var i=0;
+					var div=document.getElementById("codediv");
+					div.innerHTML="";
+					div.style.display="block";
+					for(i;i<result.length;i++)
+					{
+						div.innerHTML=div.innerHTML+'<div style="border:rgba(0,0,0,1) thin ridge;"><h4>'+ checkedLanguage[i]+'</h4><hr><p>'+ result[i]+'</p></div>';
+					}
 				}
 			}
 		xmlhttp.send(params);
-		xmlhttp.send();
+			//reset the system!
+		var del=0;
+		for(del;del<maximum;del++)
+		{
+			document.getElementById("varDetails"+del).parentNode.removeChild(document.getElementById("varDetails"+del));
+		}
+		window.current=0;
+		maximum=0;
 	}
 }
 function SuggestionFunction(json,language,var_name,var_type,dimension)
@@ -188,7 +203,7 @@ function SuggestionFunction(json,language,var_name,var_type,dimension)
 	var key,value;
 	var i=0,j=0;
 	//alert(var_name+' '+var_type+' '+dimension);
-	for(i;i<json.language.length;i++)
+	for(i=0;i<json.language.length;i++)
 	{
 		if(json.language[i].name==language[i])
 		{
@@ -204,10 +219,10 @@ function SuggestionFunction(json,language,var_name,var_type,dimension)
 					}
 					else
 					{
-						var k=0;
-						for(k=0;k<test_array.length;k++)
+						var itr=0;
+						for(itr=0;itr<test_array.length;itr++)
 						{
-							test_array[k]=test_array[k].replace("test",var_name)
+							test_array[itr]=test_array[itr].replace("test",var_name)
 						}
 					}
 					suggestion[language[i]]=test_array;
@@ -220,13 +235,13 @@ function SuggestionFunction(json,language,var_name,var_type,dimension)
 function getSuggestion(form)
 {
 	form.elements['submit'].style.display='none';
-	if(k==(maximum-1))
+	if(window.current==(maximum-1))
 	{
-		form.elements['close'].innerHTML='Save &amp; Close';
+		document.getElementById('close'+window.current).innerHTML='Save &amp; Close';
 	}
-	form.elements['close'].style.display='block';
-	var len=document.getElementsByName("language[]").length;
+	document.getElementById('close'+window.current).style.display='block';
 	var  language=document.getElementsByName("language[]");
+	var len=language.length;
 	var i=0,j=0;
 	var checkedLanguage=new Array();
 	var suggestionChecked=new Array();
@@ -236,8 +251,7 @@ function getSuggestion(form)
 		{
 			checkedLanguage[j]=language[i].value;
 			form.elements[language[i].value+'CodeSuggestionVariable'].style.display="block";
-			suggestionChecked[j]=form.elements[language[i].value+'CodeSuggestionVariable'];
-			
+			suggestionChecked[j]=document.getElementById(language[i].value+'CodeSuggestionVariable'+window.current);
 			j++;
 		}
 	}
@@ -260,6 +274,7 @@ function getSuggestion(form)
 			}
 		}
 	}
+	//this.removeEventListener(onsubmit,getSuggestion());
 }
 
 function addVariables(numArg)
@@ -274,7 +289,6 @@ function addVariables(numArg)
 	}
 	else
 	{
-		
 		var div=$("#varInfo");
 		div.html('');
 		var language=javascript.language;
@@ -284,25 +298,25 @@ function addVariables(numArg)
 			var j=i+1;
 			//div.append('<div class="form-group" style="border:rgba(0,0,0,1) thin ridge;"><fieldset><legend>Information regarding variable '+ j+'</legend>');
 			var width=100/language.length;
-			var k=0;
-			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this);return false;">';
-			for(k=0;k<language.length;k++)
+			var itr=0;
+			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this); return false;">';
+			for(itr=0;itr<language.length;itr++)
 			{
-				select_string=select_string+'<select name="'+language[k].name+'CodeSuggestionVariable" required class="pull-left form-control"  style="width:'+width+'%; display:none;"><option value="default" disabled>Select Suggestion in '+language[k].name+'</option></select>';
+				select_string=select_string+'<select name="'+language[itr].name+'CodeSuggestionVariable" id="'+language[itr].name+'CodeSuggestionVariable'+ i +'" required class="pull-left form-control"  style="width:'+width+'%; display:none;"><option value="default" disabled>Select Suggestion in '+language[itr].name+'</option></select>';
 			}
 				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
-			for(k=0;k<language.length;k++)
+			for(itr=0;itr<language.length;itr++)
 			{
-				select_string=select_string+'<option value="'+language[k].type[k].name+'" selected>'+language[k].type[k].name+'</option>';
+				select_string=select_string+'<option value="'+language[itr].type[itr].name+'" selected>'+language[itr].type[itr].name+'</option>';
 			}
 			select_string=select_string+'</select><label for="DimensionChoice">Dimension:</label><select name="dim[]"  class="form-control"><option value="default" disabled>Select Dimension</option>';
-			k=language[0].type[0].dimension.length;
+			itr=language[0].type[0].dimension.length;
 			var z=0;
-			for(z=k-1;z>=0;z--)
+			for(z=itr-1;z>=0;z--)
 			{
 				select_string=select_string+'<option value="'+ z +'" selected>'+z+'</option>';
 			}
-			div.append('<div class="modal fade" role="dialog" aria-hidden="true" id="varDetails'+i+'" data-backdrop="static"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3>Information regarding variable '+ j+'</h3></div><div class="modal-body">'+select_string+'</select></div><div class="modal-footer"><button name="close" class="btn btn-primary" onClick="closeModal()" style="display:none;">&gt;Next</button><button type="submit" name="submit" class="btn btn-primary">See Suggestion!</button></div></div></div></div></div>');
+			div.append('<div class="modal fade" role="dialog" aria-hidden="true" id="varDetails'+i+'" data-backdrop="static"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3>Information regarding variable '+ j+'</h3></div><div class="modal-body">'+select_string+'</select></div><div class="modal-footer"><a id="close'+i+'" onClick="closeModal()" style="display:none;" class="btn btn-primary">&gt;Next</a><button type="submit" name="submit" class="btn btn-primary">See Suggestion!</button></div></div></div></div></div>');
 			
 		}
 		$('#varDetails0').modal('show');
@@ -316,15 +330,8 @@ function addVariables(numArg)
     </div>
     <div class="container">
         <div class="row">
-        	<div class="col-xs-3" id="c-codediv" style="display:none; ">
-            	<div style="border:rgba(0,0,0,1) thin ridge;">
-                  <h4>C Code</h4><hr>    
-                  	<p id='c-code'>                
-                    </p>
-                </div>
-            </div>
             <div class="col-xs-6">
-                <form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this);">
+                <form method="post" action="" role="form" name="inputForm">
                     <div class="form-group">
                         <label for="LanguageChoice">
                             Language:
@@ -364,11 +371,7 @@ function addVariables(numArg)
                 </form>
             
             </div>
-			<div class="col-xs-3 " id="java-codediv" style="display:none;">
-				<div style="border:rgba(0,0,0,1) thin ridge;">
-                    <h4>JAVA Code</h4><hr>
-                  
-            	</div>
+			<div class="col-xs-6 " id="codediv" style="display:none;">
 			</div>
 	</div>
 </div>
