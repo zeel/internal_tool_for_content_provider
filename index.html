@@ -15,20 +15,233 @@
 <script src="js/jquery.js" type="text/javascript"></script>
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript">
+var javascript;
 var k=0;
 var maximum=0;
+window.onload=function()
+{
+	var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.open("GET","getDetails.php",false);
+		xmlhttp.send();
+		var json=xmlhttp.responseText; 
+		javascript=jQuery.parseJSON(json);
+		var i=0;
+		var div_checkbox=document.getElementById("language_checkbox");
+		div_checkbox.innerHTML="";
+		var select_functionReturnType=document.getElementById("functionReturnType");
+		var language=javascript.language;
+		select_functionReturnType.innerHTML="";
+		for(i=0;i<language.length;i++)
+		{
+			div_checkbox.innerHTML=div_checkbox.innerHTML+'<input type="checkbox" name="language[]" value="'+language[i].name+'" id="checkbox_'+language[i].name+'" checked onChange="onSelect(this)">'+language[i].name+'<br>';
+			select_functionReturnType.innerHTML=select_functionReturnType.innerHTML+'<option value="'+language[i].type[i].name+'" selected>'+language[i].type[i].name+'</option>'
+		}
+}
+function isNumber(n)
+{
+	return /^-?[\d.]+(?:e-?\d+)?$/.test(n); 
+}
 function onSelect(checkBox)
 {
 	var name=checkBox.value;
 	if(checkBox.checked==true)
 	{
+		if(checkBox.value=='JAVA')
+		{
 			document.getElementById('className').style.display='block';
 			$("#classNameinput").attr("required", "true");
+		}
 	}
 	else
 	{
+		if(checkBox.value=='JAVA')
+		{
 			document.getElementById('className').style.display='none';
 			$("#classNameinput").removeAttr('required');
+		}
+	}
+}
+function changeFunctionName(input)
+{
+	if(isNumber(input.value))
+	{
+		var textbox=document.getElementById('functionNameInput');
+		textbox.innerHTML="";
+		textbox.focus();
+		textbox.scrollIntoView();
+		alert('Function name can not be number');
+	}
+}
+function checkVariable(input)
+{
+	if(isNumber(input.value))
+	{
+		alert('Variable name can not be number');
+		input.innerHTML="";
+	}
+}
+function changeClassName(input)
+{
+	if(isNumber(input.value))
+	{
+		var textbox=document.getElementById('classNameInput');
+		textbox.innerHTML="";
+		textbox.focus();
+		textbox.scrollIntoView();
+		alert('Class name can not be number');
+	}
+}
+function checkCompulsory()
+{
+	if(document.getElementById('functionNameInput').value=='')
+	{
+			alert('Please Enter Function name First');
+			document.getElementById('functionNameInput').focus();
+			return;
+	}
+	var checkbox_java;
+	if(document.getElementById("checkbox_JAVA"))	checkbox_java=document.getElementById("checkbox_JAVA");
+	if(document.getElementById('classNameInput').value=='' && checkbox_java.checked==true)
+	{
+			alert('Please Enter Class name First');
+			document.getElementById('classNameInput').focus();
+	}
+}
+function closeModal()
+{
+	$('#varDetails'+k).modal('hide');
+	k++;
+	if(k<maximum)
+	{
+		$('#varDetails'+k).modal('show');
+	}
+}
+function SuggestionFunction(json,language,var_name,var_type,dimension)
+{
+	//language is array of languages in which you want suggestion
+	//var_name,var_type,dimension are variables which hold of which type suggestion is required.
+	//here it is assumed that the order of index in language is same as order of languages in json. EX C , JAVA ,python is there  in json then JAVA , python should be there in language in order. 
+	var suggestion=new Array();
+	var key,value;
+	var i=0,j=0;
+	//alert(var_name+' '+var_type+' '+dimension);
+	for(i;i<json.language.length;i++)
+	{
+		if(json.language[i].name==language[i])
+		{
+			for(j=0;j<json.language[i].type.length;j++)
+			{
+				if(json.language[i].type[j].name==var_type)
+				{
+					//now replace test with variable name
+					var test_array=json.language[i].type[j].dimension[dimension].suggestion;
+					if(typeof test_array == 'string')
+					{
+						test_array=test_array.replace("test",var_name)
+					}
+					else
+					{
+						var k=0;
+						for(k=0;k<test_array.length;k++)
+						{
+							test_array[k]=test_array[k].replace("test",var_name)
+						}
+					}
+					suggestion[language[i]]=test_array;
+				}
+			}
+		}
+	}
+	return suggestion;
+}
+function getSuggestion(form)
+{
+	form.elements['submit'].style.display='none';
+	if(k==(maximum-1))
+	{
+		form.elements['close'].innerHTML='Save &amp; Close';
+	}
+	form.elements['close'].style.display='block';
+	var len=document.getElementsByName("language[]").length;
+	var  language=document.getElementsByName("language[]");
+	var i=0,j=0;
+	var checkedLanguage=new Array();
+	var suggestionChecked=new Array();
+	for(i;i<len;i++)
+	{
+		if(language[i].checked==true)
+		{
+			checkedLanguage[j]=language[i].value;
+			suggestionChecked[j]=form.elements[language[i].value+'CodeSuggestionVariable'];
+			j++;
+		}
+	}
+	var var_name=form.elements['var_name[]'].value;
+	var var_type=form.elements['type[]'].value;
+	var dimension=form.elements['dim[]'].value;
+	var suggestions;
+	suggestions=SuggestionFunction(javascript,checkedLanguage,var_name,var_type,dimension);
+	for(i=0;i<checkedLanguage.length;i++)
+	{
+		for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
+		{
+			suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>';
+		}
+	}
+}
+
+function addVariables(numArg)
+{
+	var numArgValue=numArg.value;
+	maximum=numArgValue;
+	if(!isNumber(numArgValue))
+	{
+		alert('Number of Variables Should be a Number');
+		numArg.innerHTML="";
+		numArg.focus();
+	}
+	else
+	{
+		
+		var div=$("#varInfo");
+		div.html('');
+		var language=javascript.language;
+		for(i=0;i<numArgValue;i++)
+		{
+			var str='';
+			var j=i+1;
+			//div.append('<div class="form-group" style="border:rgba(0,0,0,1) thin ridge;"><fieldset><legend>Information regarding variable '+ j+'</legend>');
+			var width=100/language.length;
+			var k=0;
+			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this);return false;">';
+			for(k=0;k<language.length;k++)
+			{
+				select_string=select_string+'<select name="'+language[k].name+'CodeSuggestionVariable" required class="pull-left form-control" style="width:'+width+'%;"><option value="default" disabled>Select Suggestion in '+language[k].name+'</option></select>';
+			}
+				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
+			for(k=0;k<language.length;k++)
+			{
+				select_string=select_string+'<option value="'+language[k].type[k].name+'" selected>'+language[k].type[k].name+'</option>';
+			}
+			select_string=select_string+'</select><label for="DimensionChoice">Dimension:</label><select name="dim[]"  class="form-control"><option value="default" disabled>Select Dimension</option>';
+			k=language[0].type[0].dimension.length;
+			var z=0;
+			for(z=k-1;z>=0;z--)
+			{
+				select_string=select_string+'<option value="'+ z +'" selected>'+z+'</option>';
+			}
+			div.append('<div class="modal fade" role="dialog" aria-hidden="true" id="varDetails'+i+'" data-backdrop="static"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3>Information regarding variable '+ j+'</h3></div><div class="modal-body">'+select_string+'</select></div><div class="modal-footer"><button name="close" class="btn btn-primary" onClick="closeModal()" style="display:none;">&gt;Next</button><button type="submit" name="submit" class="btn btn-primary">See Suggestion!</button></div></div></div></div></div>');
+			
+		}
+		$('#varDetails0').modal('show');
 	}
 }
 </script>
@@ -39,18 +252,15 @@ function onSelect(checkBox)
     </div>
     <div class="container">
         <div class="row">
-        	<div class="col-xs-3" id="c-codediv" style="display:none;">
+        	<div class="col-xs-3" id="c-codediv" style="display:none; ">
             	<div style="border:rgba(0,0,0,1) thin ridge;">
                   <h4>C Code</h4><hr>    
                   	<p id='c-code'>                
-                    <p><p>#include &lt;stdio.h&gt;</p>
-                    <p>int <span id='c_code_functionName'>sort</span>(<span id='c_code_parameters'>int* arr, int n</span>){</p>
-                    <p>     // write your code here</p>
-                    <p>}</p></p>
+                    </p>
                 </div>
             </div>
             <div class="col-xs-6">
-                <form method="post" action="backend.php" role="form" name="inputForm">
+                <form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this);">
                     <div class="form-group">
                         <label for="LanguageChoice">
                             Language:
@@ -63,47 +273,37 @@ function onSelect(checkBox)
                             <option value="java">JAVA
                             </option>
                         </select> -->
-                        <div class="checkbox">
-                              <input type="checkbox" name="language" value="c" checked>C<br>
-                              <input type="checkbox" name="language" value="java" checked  onChange="onSelect(this)">JAVA
+                        <div class="checkbox" id="language_checkbox">
                          </div>
                     </div>
                     <div class="form-group" id="functionName">
                         <label for="functionNamelabel">Function Name:</label>
-                        <input type="text" class="form-control" name="functionName" id="functionNameInput" placeholder="Enter Function Name (sort)" required onChange="changeFunctionName(this)">
+                        <input type="text" class="form-control" name="functionName" id="functionNameInput" placeholder="Enter Function Name" required onChange="changeFunctionName(this)">
 					</div>
                     <div class="form-group" id="className">
                         <label for="classNamelabel">Class Name:</label>
-                        <input type="text" class="form-control" name="className"  placeholder="Enter Class Name (Sort)" id='classNameInput' onChange="changeClassName(this)">
+                        <input type="text" class="form-control" name="className"  placeholder="Enter Class Name" id='classNameInput' onChange='changeClassName(this)'>
 					</div>
-                    <div class="form-group" id="functionReturnType">
+                    <div class="form-group">
                         <label for="functionReturnTypelabel">Function Return Type:</label>
-                        <select name="functionReturnType" required class="form-control" >
-                            <option value="default" disabled>Select Return Type
-                            </option>
-                            <option value="c" selected>C
-                            </option>
-                            <option value="java">JAVA
-                            </option>
+                        <select name="functionReturnType" required class="form-control"  id="functionReturnType">
+                            <option value="default" disabled>Select Return Type</option>
                         </select> 
                         <!--<input type="text" class="form-control" name="functionReturnType"  placeholder="Enter Function Return Type (int)" id='functionReturnTypeInput' onChange="changeClassName(this)">-->
 					</div>
                     <div class="form-group" id="numArg">
                         <label for="numArglabel">Number of Input Arguments:</label>
-                        <input type="text" class="form-control" name="numArg" placeholder="Enter Number of Input Arguments(1)" required onChange="addVariables(this)">
+                        <input type="text" class="form-control" name="numArg" placeholder="Enter Number of Input Arguments" required onChange="addVariables(this)" onFocus="checkCompulsory()">
 					</div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <div id="varInfo">
+                    </div>
                 </form>
+            
             </div>
-			<div class="col-xs-3" id="java-codediv" style="display:none;">
+			<div class="col-xs-3 " id="java-codediv" style="display:none;">
 				<div style="border:rgba(0,0,0,1) thin ridge;">
                     <h4>JAVA Code</h4><hr>
-                    
-                  <p>public class <span id='java_code_className'>Sort</span></p>
-                    <p>  public int <span id='java_code_functionName'>sort</span>(<span id='java_code_parameters'>ArrayList arr</span>){</p>
-                    <p>     // write your code here</p>
-                    <p>  }<br>
-                      }</p>
+                  
             	</div>
 			</div>
 	</div>
