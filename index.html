@@ -180,7 +180,9 @@ function getSuggestion(form)
 		if(language[i].checked==true)
 		{
 			checkedLanguage[j]=language[i].value;
+			form.elements[language[i].value+'CodeSuggestionVariable'].style.display="block";
 			suggestionChecked[j]=form.elements[language[i].value+'CodeSuggestionVariable'];
+			
 			j++;
 		}
 	}
@@ -191,9 +193,16 @@ function getSuggestion(form)
 	suggestions=SuggestionFunction(javascript,checkedLanguage,var_name,var_type,dimension);
 	for(i=0;i<checkedLanguage.length;i++)
 	{
-		for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
+		if(typeof suggestions[checkedLanguage[i]] == 'string' )
 		{
-			suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>';
+			suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]]+'">'+suggestions[checkedLanguage[i]]+'</option>';
+		}
+		else
+		{
+			for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
+			{
+				suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>';
+			}
 		}
 	}
 }
@@ -224,7 +233,7 @@ function addVariables(numArg)
 			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this);return false;">';
 			for(k=0;k<language.length;k++)
 			{
-				select_string=select_string+'<select name="'+language[k].name+'CodeSuggestionVariable" required class="pull-left form-control" style="width:'+width+'%;"><option value="default" disabled>Select Suggestion in '+language[k].name+'</option></select>';
+				select_string=select_string+'<select name="'+language[k].name+'CodeSuggestionVariable" required class="pull-left form-control"  style="width:'+width+'%; display:none;"><option value="default" disabled>Select Suggestion in '+language[k].name+'</option></select>';
 			}
 				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
 			for(k=0;k<language.length;k++)
