@@ -1,6 +1,6 @@
 <?php
-$language=$_POST['language'];
-$num_var=$_POST['numArg'];
+$language=json_decode($_POST['language']);
+/*$num_var=$_POST['numArg'];
 $variables=$_POST['var_name'];
 $type=$_POST['type'];
 $functionName=$_POST['functionName'];
@@ -18,5 +18,6 @@ else if($language=='java')
 {
 	$className=$_POST['className'];
 	
-}
+}*/
+echo count($language).' '.$language[0].' '.$language[1];
 ?>

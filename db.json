@@ -3,95 +3,104 @@
         {
             "name": "C",
             "type": [
-                {
-                    "name": "int",
-                    "dimension": [
-                        {
-                            "suggestion": "int test"
-                        },
-                        {
-                            "suggestion": [
-                                "int* test",
-                                "int test[]"
-                            ]
-                        },
-                        {
-                            "suggestion": [
-                                "int** test",
-                                "int test[][]"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "char",
-                    "dimension": [
-                        {
-                            "suggestion": "char test"
-                        },
-                        {
-                            "suggestion": [
-                                "char* test",
-                                "char test[]"
-                            ]
-                        },
-                        {
-                            "suggestion": [
-                                "char** test",
-                                "char test[][]"
-                            ]
-                        }
-                    ]
-                }
-            ]
+                		{
+							"name": "int",
+							"dimension":
+							 [
+								{
+									"suggestion": "int test"
+								},
+								{
+									"suggestion": 
+									[
+										"int* test",
+										"int test[]"
+									]
+								},
+								{
+									"suggestion": 
+									[
+										"int** test",
+										"int test[][]"
+									]
+								}
+							]
+						},
+						{
+							"name": "char",
+							"dimension": 
+							[
+								{
+									"suggestion": "char test"
+								},
+								{
+									"suggestion": 
+									[
+										"char* test",
+										"char test[]"
+									]
+								},
+								{
+									"suggestion": 
+									[
+										"char** test",
+										"char test[][]"
+									]
+								}
+							]
+						}
+           	 		],
+			"fuctionSignature": "functionReturnType FunctionName ( Variables ){\n     // write your code here \n }"
         },
         {
             "name": "JAVA",
-            "type": [
-                {
-                    "name": "int",
-                    "dimension": [
-                        {
-                            "suggestion": "int test"
-                        },
-                        {
-                            "suggestion": [
-                                "int[] test",
-                                "ArrayList<Integer> test",
-                                "Set<Integer> test"
-                            ]
-                        },
-                        {
-                            "suggestion": [
-                                "int[][] test",
-                                "ArrayList<ArrayList<Integer>> test"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "char",
-                    "dimension": [
-                        {
-                            "suggestion": "char test"
-                        },
-                        {
-                            "suggestion": [
-                                "char[] test",
-                                "String test",
-                                "ArrayList<Character> test"
-                            ]
-                        },
-                        {
-                            "suggestion": [
-                                "char[][] test",
-                                "String[] test",
-                                "ArrayList<ArrayList<Character>> test"
-                            ]
-                        }
-                    ]
-                }
-            ]
+			"type":
+					 [
+						{
+							"name": "int",
+							"dimension": [
+								{
+									"suggestion": "int test"
+								},
+								{
+									"suggestion": [
+										"int[] test",
+										"ArrayList<Integer> test",
+										"Set<Integer> test"
+									]
+								},
+								{
+									"suggestion": [
+										"int[][] test",
+										"ArrayList<ArrayList<Integer>> test"
+									]
+								}
+							]
+						},
+						{
+							"name": "char",
+							"dimension": [
+								{
+									"suggestion": "char test"
+								},
+								{
+									"suggestion": [
+										"char[] test",
+										"String test",
+										"ArrayList<Character> test"
+									]
+								},
+								{
+									"suggestion": [
+										"char[][] test",
+										"String[] test",
+										"ArrayList<ArrayList<Character>> test"
+									]
+								}
+							]
+						}
+					],
+		"fuctionSignature": "public class className {\n  public functionReturnType FunctionName(Variables){\n     // write your code here \n  } \n }"
         }
     ]
 }

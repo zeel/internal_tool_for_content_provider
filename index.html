@@ -122,6 +122,9 @@ function closeModal()
 	if(k<maximum)
 	{
 		$('#varDetails'+k).modal('show');
+	}
+	else if(k==(maximum))
+	{
 		var xmlhttp;
 		if (window.XMLHttpRequest)
 		{// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -131,9 +134,49 @@ function closeModal()
 		{// code for IE6, IE5
 			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
-		xmlhttp.open("GET","getDetails.php",false);
+		var  language=document.getElementsByName("language[]");
+		var len=language.length;
+		var i=0,j=0;
+		var checkedLanguage=new Array();
+		var suggestionChecked=new Array();
+		for(i=0;i<len;i++)
+		{
+			if(language[i].checked==true)
+			{
+				checkedLanguage[j]=language[i].value;
+				j++;
+			}
+		}
+		var noLanguageChecked=checkedLanguage.length;
+		var suggestionsArray=new Array();
+		for(i=0;i<noLanguageChecked;i++)
+		{
+			var temp=document.getElementsByName(checkedLanguage[i]+'CodeSuggestionVariable');
+			var suggestion=new Array();
+			for(j=0;j<temp.length;j++)
+			{
+				suggestion[j]=temp[j].value;
+				alert(temp[j].value);
+			}
+			
+			suggestionsArray[checkedLanguage[i]]=suggestion;			
+		}
+		var functionName=document.getElementById(functionNameInput).value;
+		//here for java i am checking if classname exists or not so using hardcoded values
+		classNameInput
+		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName;
+		xmlhttp.open("POST","backend.php",true);
+		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlhttp.setRequestHeader("Content-length", params.length);
+		xmlhttp.setRequestHeader("Connection", "close");
+		xmlhttp.onreadystatechange = function()
+			{//Call a function when the state changes.
+				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					alert(xmlhttp.responseText);
+				}
+			}
+		xmlhttp.send(params);
 		xmlhttp.send();
-		var json=xmlhttp.responseText; 
 	}
 }
 function SuggestionFunction(json,language,var_name,var_type,dimension)
