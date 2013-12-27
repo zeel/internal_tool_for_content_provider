@@ -122,6 +122,18 @@ function closeModal()
 	if(k<maximum)
 	{
 		$('#varDetails'+k).modal('show');
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.open("GET","getDetails.php",false);
+		xmlhttp.send();
+		var json=xmlhttp.responseText; 
 	}
 }
 function SuggestionFunction(json,language,var_name,var_type,dimension)
