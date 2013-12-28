@@ -50,7 +50,7 @@
 							]
 						}
            	 		],
-			"fuctionSignature": "functionReturnType functionName ( variables )<br>{<br>     // write your code here <br> }"
+			"fuctionSignature": "functionReturn functionName ( variables )<br>{<br>     // write your code here <br> }"
         },
         {
             "name": "JAVA",
@@ -65,14 +65,14 @@
 								{
 									"suggestion": [
 										"int[] test",
-										"ArrayList &lt; Integer &gt; test",
-										"Set&lt;Integer&gt;test"
+										"ArrayList test",
+										"Set test"
 									]
 								},
 								{
 									"suggestion": [
 										"int[][] test",
-										"ArrayList&lt;ArrayList&lt;Integer&gt;&gt; test"
+										"ArrayList ArrayList test"
 									]
 								}
 							]
@@ -87,20 +87,20 @@
 									"suggestion": [
 										"char[] test",
 										"String test",
-										"ArrayList&lt;Character&gt; test"
+										"ArrayList test"
 									]
 								},
 								{
 									"suggestion": [
 										"char[][] test",
 										"String[] test",
-										"ArrayList&lt;ArrayList&lt;Character&gt;&gt; test"
+										"ArrayList&lt;ArrayList test"
 									]
 								}
 							]
 						}
 					],
-		           "fuctionSignature": "public class className <br> { <br>public functionReturnType functionName ( variables ) <br> { <br>// write your code here <br>} <br> }"
+		           "fuctionSignature": "public class className <br> { <br>public functionReturn functionName ( variables ) <br> { <br>// write your code here <br>} <br> }"
         }
     ]
 }

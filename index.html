@@ -37,12 +37,20 @@ window.onload=function()
 		var div_checkbox=document.getElementById("language_checkbox");
 		div_checkbox.innerHTML="";
 		var select_functionReturnType=document.getElementById("functionReturnType");
+		var functionReturnDimension=document.getElementById("functionReturnDimension");
 		var language=javascript.language;
 		select_functionReturnType.innerHTML="";
+		functionReturnDimension.innerHTML="";
 		for(i=0;i<language.length;i++)
 		{
 			div_checkbox.innerHTML=div_checkbox.innerHTML+'<input type="checkbox" name="language[]" value="'+language[i].name+'" id="checkbox_'+language[i].name+'" checked onChange="onSelect(this)">'+language[i].name+'<br>';
-			select_functionReturnType.innerHTML=select_functionReturnType.innerHTML+'<option value="'+language[i].type[i].name+'" selected>'+language[i].type[i].name+'</option>'
+			select_functionReturnType.innerHTML=select_functionReturnType.innerHTML+'<option value="'+language[i].type[i].name+'" selected>'+language[i].type[i].name+'</option>';
+		}
+		itr=language[0].type[0].dimension.length;
+		var z=0;
+		for(z=itr-1;z>=0;z--)
+		{
+			functionReturnDimension.innerHTML=functionReturnDimension.innerHTML+'<option value="'+ z +'" selected>'+z+'</option>';
 		}
 }
 function isNumber(n)
@@ -151,8 +159,9 @@ function closeModal()
 		}
 		var functionName=document.getElementById('functionNameInput').value;
 		var functionReturnType=document.getElementById('functionReturnType').value;
+		var functionReturnDimension=document.getElementById('functionReturnDimension').value;
 		//here for java i am checking if classname exists or not so using hardcoded values
-		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType;// parametes passed to php files. variables are passed in array of array form.
+		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType+"&functionReturnDimension="+functionReturnDimension;// parametes passed to php files. variables are passed in array of array form.
 		if(document.getElementById('checkbox_JAVA').checked==true)params=params+'&className='+document.getElementById('classNameInput').value;		
 		var xmlhttp;
 		if (window.XMLHttpRequest)
@@ -170,7 +179,7 @@ function closeModal()
 				//Call a function when the state changes.
 				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) 
 				{
-					var result=JSON.parse(xmlhttp.responseText)
+					var result=JSON.parse(xmlhttp.responseText);
 					var i=0;
 					var div=document.getElementById("codediv");
 					div.innerHTML="";
