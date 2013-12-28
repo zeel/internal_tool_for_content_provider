@@ -165,8 +165,6 @@ function closeModal()
 		}
 		xmlhttp.open("POST","backend.php",true);
 		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		xmlhttp.setRequestHeader("Content-length", params.length);
-		xmlhttp.setRequestHeader("Connection", "close");
 		xmlhttp.onreadystatechange = function()
 			{
 				//Call a function when the state changes.
@@ -274,6 +272,12 @@ function getSuggestion(form)
 			}
 		}
 	}
+	form.elements['var_name[]'].style.display='none';
+	form.elements['type[]'].style.display='none';
+	form.elements['dim[]'].style.display='none';
+	document.getElementById('DimensionChoice'+window.current).style.display='none';
+	document.getElementById('TypeChoice'+window.current).style.display='none';
+	document.getElementById('var_namelabel'+window.current).style.display='none';
 	//this.removeEventListener(onsubmit,getSuggestion());
 }
 
@@ -302,14 +306,14 @@ function addVariables(numArg)
 			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this); return false;">';
 			for(itr=0;itr<language.length;itr++)
 			{
-				select_string=select_string+'<select name="'+language[itr].name+'CodeSuggestionVariable" id="'+language[itr].name+'CodeSuggestionVariable'+ i +'" required class="pull-left form-control"  style="width:'+width+'%; display:none;"><option value="default" disabled>Select Suggestion in '+language[itr].name+'</option></select>';
+				select_string=select_string+'<select name="'+language[itr].name+'CodeSuggestionVariable" id="'+language[itr].name+'CodeSuggestionVariable'+ i +'" required class="pull-left form-control"  style="display:none;"><option value="default" disabled>Select Suggestion in '+language[itr].name+'</option></select><br>';
 			}
-				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
+				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel" id="var_namelabel'+i+'">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice" id="TypeChoice'+i+'">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
 			for(itr=0;itr<language.length;itr++)
 			{
 				select_string=select_string+'<option value="'+language[itr].type[itr].name+'" selected>'+language[itr].type[itr].name+'</option>';
 			}
-			select_string=select_string+'</select><label for="DimensionChoice">Dimension:</label><select name="dim[]"  class="form-control"><option value="default" disabled>Select Dimension</option>';
+			select_string=select_string+'</select><label for="DimensionChoice"  id="DimensionChoice'+i+'">Dimension:</label><select name="dim[]"  class="form-control"><option value="default" disabled>Select Dimension</option>';
 			itr=language[0].type[0].dimension.length;
 			var z=0;
 			for(z=itr-1;z>=0;z--)
@@ -359,6 +363,13 @@ function addVariables(numArg)
                         <label for="functionReturnTypelabel">Function Return Type:</label>
                         <select name="functionReturnType" required class="form-control"  id="functionReturnType">
                             <option value="default" disabled>Select Return Type</option>
+                        </select> 
+                        <!--<input type="text" class="form-control" name="functionReturnType"  placeholder="Enter Function Return Type (int)" id='functionReturnTypeInput' onChange="changeClassName(this)">-->
+					</div>
+                    <div class="form-group">
+                        <label for="functionReturnTypelabel">Function Return Dimension:</label>
+                        <select name="functionReturnDimension" required class="form-control"  id="functionReturnDimension">
+                            <option value="default" disabled>Select Return Dimension</option>
                         </select> 
                         <!--<input type="text" class="form-control" name="functionReturnType"  placeholder="Enter Function Return Type (int)" id='functionReturnTypeInput' onChange="changeClassName(this)">-->
 					</div>
