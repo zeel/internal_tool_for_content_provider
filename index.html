@@ -169,7 +169,6 @@ function checkVariable(input)
 }
 function seeSuggestion()
 {
-	alert(1);
 	if(window.current==(maximum-1) && $("[data-done=1]").length==(maximum-1))
 	{
 		$('.close1').css("display","none");
@@ -392,7 +391,7 @@ function GetSkeleton()
 					</div>
                     <div class="form-group">
                         <label for="selectVariablelabel">Select Variable</label>
-                        <select type="text" class="form-control" name="selectVariable" id="selectVariable" required onChange="display(this)"><option value="default" disabled>Select Variable</option></select>
+                        <select type="text" class="form-control" name="selectVariable" id="selectVariable" required onBlur="display(this)"><option value="default" disabled>Select Variable</option></select>
 					</div>
 					<div id="varInfo">
                     </div>
