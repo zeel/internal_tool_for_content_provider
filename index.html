@@ -15,44 +15,38 @@
 <script src="js/jquery.js" type="text/javascript"></script>
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript">
-var javascript;
+var javascriptObject;
 window.current=0;
 var maximum=0;
-window.onload=function()
+var checkedLanguage=new Array();
+$(document).ready(function()
 {
-	var xmlhttp;
-		if (window.XMLHttpRequest)
-		{// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp=new XMLHttpRequest();
-		}
-		else
-		{// code for IE6, IE5
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		xmlhttp.open("GET","getDetails.php",false);
-		xmlhttp.send();
-		var json=xmlhttp.responseText; 
-		javascript=jQuery.parseJSON(json);
-		var i=0;
-		var div_checkbox=document.getElementById("language_checkbox");
-		div_checkbox.innerHTML="";
-		var select_functionReturnType=document.getElementById("functionReturnType");
-		var functionReturnDimension=document.getElementById("functionReturnDimension");
-		var language=javascript.language;
-		select_functionReturnType.innerHTML="";
-		functionReturnDimension.innerHTML="";
-		for(i=0;i<language.length;i++)
+		var xmlhttp=$.ajax({
+			url:"getDetails.php",
+			type:"GET"
+		}).done(function( javascript ) 
 		{
-			div_checkbox.innerHTML=div_checkbox.innerHTML+'<input type="checkbox" name="language[]" value="'+language[i].name+'" id="checkbox_'+language[i].name+'" checked onChange="onSelect(this)">'+language[i].name+'<br>';
-			select_functionReturnType.innerHTML=select_functionReturnType.innerHTML+'<option value="'+language[i].type[i].name+'" selected>'+language[i].type[i].name+'</option>';
-		}
-		itr=language[0].type[0].dimension.length;
-		var z=0;
-		for(z=itr-1;z>=0;z--)
-		{
-			functionReturnDimension.innerHTML=functionReturnDimension.innerHTML+'<option value="'+ z +'" selected>'+z+'</option>';
-		}
-}
+			javascriptObject=javascript;
+			var i=0;
+			var div_checkbox=$("#language_checkbox").html("");
+			var select_functionReturnType=$("#functionReturnType").html(new Option("Select Function Return Type","default"));
+			var functionReturnDimension=$("#functionReturnDimension").html(new Option("Select Function Return Dimension","default"));
+			var language=javascriptObject.language;
+			for(i=0;i<language.length;i++)
+			{
+				div_checkbox.append('<input type="checkbox" name="language[]" value="'+language[i].name+'" id="checkbox_'+language[i].name+'" checked onChange="onSelect(this)">'+language[i].name+'<br>');
+				select_functionReturnType.append('<option value="'+language[i].type[i].name+'" >'+language[i].type[i].name+'</option>');
+			}
+			itr=language[0].type[0].dimension.length;
+			var z=0;
+			for(z=itr-1;z>=0;z--)
+			{
+				functionReturnDimension.append('<option value="'+ z +'">'+z+'</option>');
+			}
+  		}
+		);
+		
+});
 function isNumber(n)
 {
 	return /^-?[\d.]+(?:e-?\d+)?$/.test(n); 
@@ -64,7 +58,7 @@ function onSelect(checkBox)
 	{
 		if(checkBox.value=='JAVA')
 		{
-			document.getElementById('className').style.display='block';
+			$('#className').css("display","block");
 			$("#classNameinput").attr("required", "true");
 		}
 	}
@@ -72,7 +66,7 @@ function onSelect(checkBox)
 	{
 		if(checkBox.value=='JAVA')
 		{
-			document.getElementById('className').style.display='none';
+			$('#className').css("display","none");
 			$("#classNameinput").removeAttr('required');
 		}
 	}
@@ -81,12 +75,89 @@ function changeFunctionName(input)
 {
 	if(isNumber(input.value))
 	{
-		var textbox=document.getElementById('functionNameInput');
-		textbox.innerHTML="";
-		textbox.focus();
-		textbox.scrollIntoView();
+		var textbox=$('#functionNameInput').html("").focus();
 		alert('Function name can not be number');
 	}
+}
+function changeClassName(input)
+{
+	if(isNumber(input.value))
+	{
+		var textbox=$('#classNameInput').html("").focus();
+		alert('Class name can not be number');
+	}
+}
+function checkCompulsory()
+{
+	if($('#functionNameInput').val()=='')
+	{
+			alert('Please Enter Function name First');
+			$('#functionNameInput').focus();
+			return;
+	}
+	var checkbox_java;
+	if($("#checkbox_JAVA"))checkbox_java=$("#checkbox_JAVA");
+	if($('#classNameInput').val()=='' && checkbox_java.prop('checked'))
+	{
+			alert('Please Enter Class name First');
+			$('#classNameInput').focus();
+	}
+}
+function addVariables(numArg)
+{
+	$('#submit').hide();
+	var numArgValue=numArg.value;
+	maximum=numArgValue;
+	if(!isNumber(numArgValue))
+	{
+		alert('Number of Variables Should be a Number');
+		numArg.innerHTML="";
+		numArg.focus();
+	}
+	else
+	{
+		var i=1;
+		$("#selectVariable").html(new Option("Select Variable index","default"));
+		for(i=1;i<=numArgValue;i++)
+			$("#selectVariable").append(new Option(i,i));
+		var div=$("#varInfo");
+		div.html('');
+		var language=javascriptObject.language;
+		for(i=0;i<numArgValue;i++)
+		{
+			var j=i+1;
+			//div.append('<div class="form-group" style="border:rgba(0,0,0,1) thin ridge;"><fieldset><legend>Information regarding variable '+ j+'</legend>');
+			var itr=0;
+			var select_string='';
+			for(itr=0;itr<language.length;itr++)
+			{
+				select_string=select_string+'<select name="'+language[itr].name+'CodeSuggestionVariable" id="'+language[itr].name+'CodeSuggestionVariable'+ i +'" required class="form-control"  style="display:none;"><option value="default" disabled>Select Suggestion in '+language[itr].name+'</option></select><br>';
+			}
+				select_string='<div id="languageSuggestion'+i+'" style="display:none;"><h3>Select Suggestion regarding variable '+ j+'</h3>'+select_string+'<a onClick="seeNextVariable()" class="btn btn-primary close1">&gt;Next</a></div>'+'<div id="variableDetail'+i+'" style="display:none;"><h3>Information regarding variable '+ j+'</h3><label for="var_namelabel">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  placeholder="Enter Variable Name" required ><label for="TypeChoice">Type :</label><select required class="form-control" id="var_type'+i+'"><option value="default" disabled>Select Type</option>';
+			for(itr=0;itr<language.length;itr++)
+			{
+				select_string=select_string+'<option value="'+language[itr].type[itr].name+'" selected>'+language[itr].type[itr].name+'</option>';
+			}
+			select_string=select_string+'</select><label for="DimensionChoice">Dimension:</label><select class="form-control" id="var_dim'+i+'"><option value="default" disabled>Select Dimension</option>';
+			itr=language[0].type[0].dimension.length;
+			var z=0;
+			for(z=itr-1;z>=0;z--)
+			{
+				select_string=select_string+'<option value="'+ z +'" selected>'+z+'</option>';
+			}
+			div.append('<div id="variable'+i+'" style="display:none;" data-done="0">'+select_string+'</select><br><a class="btn btn-primary" onClick="seeSuggestion()">See Suggestion!</a></div></div>');
+			
+		}
+	}
+}
+function display(selectVariable)
+{
+	var index=parseInt(selectVariable.value)-1;
+	$("#variable"+window.current).hide();
+	$("#variable"+index).show();
+	$("#variableDetail"+index).show();
+	$("#languageSuggestion"+index).hide();
+	window.current=index;
 }
 function checkVariable(input)
 {
@@ -96,109 +167,48 @@ function checkVariable(input)
 		input.innerHTML="";
 	}
 }
-function changeClassName(input)
+function seeSuggestion()
 {
-	if(isNumber(input.value))
+	alert(1);
+	if(window.current==(maximum-1) && $("[data-done=1]").length==(maximum-1))
 	{
-		var textbox=document.getElementById('classNameInput');
-		textbox.innerHTML="";
-		textbox.focus();
-		textbox.scrollIntoView();
-		alert('Class name can not be number');
+		$('.close1').css("display","none");
+		$('#submit').show();
 	}
-}
-function checkCompulsory()
-{
-	if(document.getElementById('functionNameInput').value=='')
+	$("#variableDetail"+window.current).hide();
+	$("#languageSuggestion"+window.current).show();
+	var  language=$("[name='language[]']");
+	var len=language.length;
+	var i=0,j=0;
+	var suggestionChecked=new Array();
+	for(i;i<len;i++)
 	{
-			alert('Please Enter Function name First');
-			document.getElementById('functionNameInput').focus();
-			return;
-	}
-	var checkbox_java;
-	if(document.getElementById("checkbox_JAVA"))	checkbox_java=document.getElementById("checkbox_JAVA");
-	if(document.getElementById('classNameInput').value=='' && checkbox_java.checked==true)
-	{
-			alert('Please Enter Class name First');
-			document.getElementById('classNameInput').focus();
-	}
-}
-function closeModal()
-{
-	$('#varDetails'+window.current).modal('hide');
-	window.current++;
-	if(window.current<maximum)
-	{
-		$('#varDetails'+window.current).modal('show');
-	}
-	else if(window.current==(maximum))
-	{
-		var  language=document.getElementsByName("language[]");
-		var len=language.length;
-		var i=0,j=0;
-		var checkedLanguage=new Array();
-		var suggestionChecked=new Array();
-		for(i=0;i<len;i++)
+		if(language.get(i).checked==true)
 		{
-			if(language[i].checked==true)
-			{
-				checkedLanguage[j]=language[i].value;
-				j++;
-			}
+			checkedLanguage[j]=language.get(i).value;
+			$('#'+language.get(i).value+'CodeSuggestionVariable'+window.current).show().change().html('');
+			suggestionChecked[j]=$('#'+language.get(i).value+'CodeSuggestionVariable'+window.current).html(new Option("Select Suggestion in "+language.get(i).value,"default"));
+			j++;
 		}
-		var noLanguageChecked=checkedLanguage.length;
-		var suggestionsArray='';
-		for(i=0;i<noLanguageChecked;i++)
+	}
+	var var_name=$("#var_name"+window.current).val();
+	var var_type=$("#var_type"+window.current).val();
+	var dimension=$("#var_dim"+window.current).val();
+	var suggestions;
+	suggestions=SuggestionFunction(javascriptObject,checkedLanguage,var_name,var_type,dimension);
+	for(i=0;i<checkedLanguage.length;i++)
+	{
+		if(typeof suggestions[checkedLanguage[i]] == 'string' )
 		{
-			var temp=new Array();
-			for(j=0;j<maximum;j++)
-			{
-				temp[j]=document.getElementById(checkedLanguage[i]+'CodeSuggestionVariable'+j).value;
-			}			
-			suggestionsArray=suggestionsArray+'&'+checkedLanguage[i]+'variables='+JSON.stringify(temp);			
-		}
-		var functionName=document.getElementById('functionNameInput').value;
-		var functionReturnType=document.getElementById('functionReturnType').value;
-		var functionReturnDimension=document.getElementById('functionReturnDimension').value;
-		//here for java i am checking if classname exists or not so using hardcoded values
-		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType+"&functionReturnDimension="+functionReturnDimension;// parametes passed to php files. variables are passed in array of array form.
-		if(document.getElementById('checkbox_JAVA').checked==true)params=params+'&className='+document.getElementById('classNameInput').value;		
-		var xmlhttp;
-		if (window.XMLHttpRequest)
-		{// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp=new XMLHttpRequest();
+			suggestionChecked[i].append('<option value="'+suggestions[checkedLanguage[i]]+'">'+suggestions[checkedLanguage[i]]+'</option>');
 		}
 		else
-		{// code for IE6, IE5
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		xmlhttp.open("POST","backend.php",true);
-		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		xmlhttp.onreadystatechange = function()
-			{
-				//Call a function when the state changes.
-				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) 
-				{
-					var result=JSON.parse(xmlhttp.responseText);
-					var i=0;
-					var div=document.getElementById("codediv");
-					div.innerHTML="";
-					div.style.display="block";
-					for(i;i<result.length;i++)
-					{
-						div.innerHTML=div.innerHTML+'<div style="border:rgba(0,0,0,1) thin ridge;"><h4>'+ checkedLanguage[i]+'</h4><hr><p>'+ result[i]+'</p></div>';
-					}
-				}
-			}
-		xmlhttp.send(params);
-			//reset the system!
-		var del=0;
-		for(del;del<maximum;del++)
 		{
-			document.getElementById("varDetails"+del).parentNode.removeChild(document.getElementById("varDetails"+del));
+			for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
+			{
+				suggestionChecked[i].append('<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>');
+			}
 		}
-		window.current=0;
-		maximum=0;
 	}
 }
 function SuggestionFunction(json,language,var_name,var_type,dimension)
@@ -239,100 +249,94 @@ function SuggestionFunction(json,language,var_name,var_type,dimension)
 	}
 	return suggestion;
 }
-function getSuggestion(form)
+function seeNextVariable()
 {
-	form.elements['submit'].style.display='none';
-	if(window.current==(maximum-1))
+	$("#variable"+window.current).attr("data-done",1);
+	$("#variable"+window.current).hide();
+	window.current=window.current+1;
+	if($("[data-done=1]").length==(maximum))
 	{
-		document.getElementById('close'+window.current).innerHTML='Save &amp; Close';
-	}
-	document.getElementById('close'+window.current).style.display='block';
-	var  language=document.getElementsByName("language[]");
-	var len=language.length;
-	var i=0,j=0;
-	var checkedLanguage=new Array();
-	var suggestionChecked=new Array();
-	for(i;i<len;i++)
-	{
-		if(language[i].checked==true)
-		{
-			checkedLanguage[j]=language[i].value;
-			form.elements[language[i].value+'CodeSuggestionVariable'].style.display="block";
-			suggestionChecked[j]=document.getElementById(language[i].value+'CodeSuggestionVariable'+window.current);
-			j++;
-		}
-	}
-	var var_name=form.elements['var_name[]'].value;
-	var var_type=form.elements['type[]'].value;
-	var dimension=form.elements['dim[]'].value;
-	var suggestions;
-	suggestions=SuggestionFunction(javascript,checkedLanguage,var_name,var_type,dimension);
-	for(i=0;i<checkedLanguage.length;i++)
-	{
-		if(typeof suggestions[checkedLanguage[i]] == 'string' )
-		{
-			suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]]+'">'+suggestions[checkedLanguage[i]]+'</option>';
-		}
-		else
-		{
-			for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
-			{
-				suggestionChecked[i].innerHTML=suggestionChecked[i].innerHTML+'<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>';
-			}
-		}
-	}
-	form.elements['var_name[]'].style.display='none';
-	form.elements['type[]'].style.display='none';
-	form.elements['dim[]'].style.display='none';
-	document.getElementById('DimensionChoice'+window.current).style.display='none';
-	document.getElementById('TypeChoice'+window.current).style.display='none';
-	document.getElementById('var_namelabel'+window.current).style.display='none';
-	//this.removeEventListener(onsubmit,getSuggestion());
-}
-
-function addVariables(numArg)
-{
-	var numArgValue=numArg.value;
-	maximum=numArgValue;
-	if(!isNumber(numArgValue))
-	{
-		alert('Number of Variables Should be a Number');
-		numArg.innerHTML="";
-		numArg.focus();
+		$('.close1').css("display","none");
+		$('#submit').show();
 	}
 	else
 	{
-		var div=$("#varInfo");
-		div.html('');
-		var language=javascript.language;
-		for(i=0;i<numArgValue;i++)
+		if(window.current<maximum)
 		{
-			var str='';
-			var j=i+1;
-			//div.append('<div class="form-group" style="border:rgba(0,0,0,1) thin ridge;"><fieldset><legend>Information regarding variable '+ j+'</legend>');
-			var width=100/language.length;
-			var itr=0;
-			var select_string='<form method="post" action="backend.php" role="form" name="inputForm" onSubmit="getSuggestion(this); return false;">';
-			for(itr=0;itr<language.length;itr++)
-			{
-				select_string=select_string+'<select name="'+language[itr].name+'CodeSuggestionVariable" id="'+language[itr].name+'CodeSuggestionVariable'+ i +'" required class="pull-left form-control"  style="display:none;"><option value="default" disabled>Select Suggestion in '+language[itr].name+'</option></select><br>';
-			}
-				select_string=select_string+'<span class="clearfix"></span><label for="var_namelabel" id="var_namelabel'+i+'">Enter Variable Name:</label><input type="text" class="form-control" id="var_name'+i+'" onChange="checkVariable(this)"  name="var_name[]"  placeholder="Enter Variable Name" required ><label for="TypeChoice" id="TypeChoice'+i+'">Type :</label><select name="type[]" required class="form-control"><option value="default" disabled>Select Type</option>';
-			for(itr=0;itr<language.length;itr++)
-			{
-				select_string=select_string+'<option value="'+language[itr].type[itr].name+'" selected>'+language[itr].type[itr].name+'</option>';
-			}
-			select_string=select_string+'</select><label for="DimensionChoice"  id="DimensionChoice'+i+'">Dimension:</label><select name="dim[]"  class="form-control"><option value="default" disabled>Select Dimension</option>';
-			itr=language[0].type[0].dimension.length;
-			var z=0;
-			for(z=itr-1;z>=0;z--)
-			{
-				select_string=select_string+'<option value="'+ z +'" selected>'+z+'</option>';
-			}
-			div.append('<div class="modal fade" role="dialog" aria-hidden="true" id="varDetails'+i+'" data-backdrop="static"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3>Information regarding variable '+ j+'</h3></div><div class="modal-body">'+select_string+'</select></div><div class="modal-footer"><a id="close'+i+'" onClick="closeModal()" style="display:none;" class="btn btn-primary">&gt;Next</a><button type="submit" name="submit" class="btn btn-primary">See Suggestion!</button></div></div></div></div></div>');
-			
+			var label=window.current+1;
+			$("#selectVariable option[value='"+label+"']").attr("selected", "selected");
+			$("#variable"+window.current).show();
+			$("#variableDetail"+window.current).show();
+			$("#languageSuggestion"+window.current).hide();
 		}
-		$('#varDetails0').modal('show');
+		else if(window.current==maximum)
+		{
+			$("#variable"+window.current).attr("data-done",1);
+			$("#variable"+window.current).hide();
+			var div=$("[data-done=0]").get(0);
+			div.style.display="block";
+			var div_id=div.id;
+			var current=div_id.split("variable")[1];
+			window.current=parseInt(current);
+			var label=window.current+1;
+			$("#selectVariable option[value='"+label+"']").attr("selected", "selected");
+			$("#variableDetail"+window.current).show();
+			$("#languageSuggestion"+window.current).hide();
+		}
+	}
+}
+function GetSkeleton()
+{
+	$("#variable"+window.current).attr("data-done",1);
+	$("#variable"+window.current).hide();
+	if($("[data-done=1]").length==(maximum))
+	{
+		var  language=$("[name='language[]']");
+		var len=language.length;
+		var i=0,j=0;
+		var noLanguageChecked=checkedLanguage.length;
+		var suggestionsArray='';
+		for(i=0;i<noLanguageChecked;i++)
+		{
+			var temp=new Array();
+			for(j=0;j<maximum;j++)
+			{
+				temp[j]=$("#"+checkedLanguage[i]+'CodeSuggestionVariable'+j).val();
+			}			
+			suggestionsArray=suggestionsArray+'&'+checkedLanguage[i]+'variables='+JSON.stringify(temp);			
+		}
+		var functionName=$('#functionNameInput').val();
+		var functionReturnType=$('#functionReturnType').val();
+		var functionReturnDimension=$('#functionReturnDimension').val();
+		//here for java i am checking if classname exists or not so using hardcoded values
+		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType+"&functionReturnDimension="+functionReturnDimension;// parametes passed to php files. variables are passed the form langNamevariables=arr[]
+		if($('#checkbox_JAVA').prop('checked'))params=params+'&className='+$('#classNameInput').val();		
+		var xmlhttp=$.ajax({
+			url:"backend.php",
+			type:"POST",
+			data: params,
+  			dataType: "html"
+		}).done(function( result ) 
+		{
+			result=JSON.parse(result);
+			var i=0;
+			var div=$("#codediv").html("").css("display","block");
+			for(i;i<result.length;i++)
+			{
+				div.append('<div style="border:rgba(0,0,0,1) thin ridge;" id="skeleton'+ checkedLanguage[i]+'"><h4>'+ checkedLanguage[i]+'</h4><hr><p>'+ result[i]+'</p></div>');
+			}
+		});
+	}
+	else
+	{
+		alert('Please Enter details of all Variables');
+		var div=$("[data-done=0]").get(0);
+		div.style.display="block";
+		var div_id=div.id;
+		var current=div_id.split("variable")[1];
+		window.current=current;
+		$("#variableDetail"+window.current).show();
+		$("#languageSuggestion"+window.current).hide();
 	}
 }
 </script>
@@ -344,7 +348,7 @@ function addVariables(numArg)
     <div class="container">
         <div class="row">
             <div class="col-xs-6">
-                <form method="post" action="" role="form" name="inputForm">
+                <form method="post" role="form" name="inputForm" onSubmit="return false;">
                     <div class="form-group">
                         <label for="LanguageChoice">
                             Language:
@@ -386,8 +390,15 @@ function addVariables(numArg)
                         <label for="numArglabel">Number of Input Arguments:</label>
                         <input type="text" class="form-control" name="numArg" placeholder="Enter Number of Input Arguments" required onChange="addVariables(this)" onFocus="checkCompulsory()">
 					</div>
-                    <div id="varInfo">
+                    <div class="form-group">
+                        <label for="selectVariablelabel">Select Variable</label>
+                        <select type="text" class="form-control" name="selectVariable" id="selectVariable" required onChange="display(this)"><option value="default" disabled>Select Variable</option></select>
+					</div>
+					<div id="varInfo">
                     </div>
+                    <div class="form-group">
+                        <button id="submit" class="btn btn-default" style="display:none;" onClick="GetSkeleton()">Get Skeleton!</button>
+					</div>
                 </form>
             
             </div>

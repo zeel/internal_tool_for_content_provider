@@ -65,14 +65,14 @@
 								{
 									"suggestion": [
 										"int[] test",
-										"ArrayList test",
+										"ArrayList Integer test",
 										"Set test"
 									]
 								},
 								{
 									"suggestion": [
 										"int[][] test",
-										"ArrayList ArrayList test"
+										"ArrayList ArrayList Integer test"
 									]
 								}
 							]
@@ -87,14 +87,14 @@
 									"suggestion": [
 										"char[] test",
 										"String test",
-										"ArrayList test"
+										"ArrayList Character test"
 									]
 								},
 								{
 									"suggestion": [
 										"char[][] test",
 										"String[] test",
-										"ArrayList&lt;ArrayList test"
+										"ArrayList ArrayList Character test"
 									]
 								}
 							]
