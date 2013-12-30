@@ -89,6 +89,23 @@ function changeClassName(input)
 		alert('Class name can not be number');
 	}
 }
+function seeFunctionSuggestion()
+{
+	var functionReturnType=$('#functionReturnType');
+	var functionReturnDimension=$('#functionReturnDimension');
+	if(functionReturnType.val()=='')
+	{
+		alert("Please Select Function Return Type");
+		functionReturnType.focus();
+		return;
+	}
+	if(functionReturnDimension.val()=='')
+	{
+		alert("Please Select Function Return Dimension");
+		functionReturnDimension.focus();
+		return
+	}
+}
 function checkCompulsory()
 {
 	if($('#functionNameInput').val()=='')
@@ -382,7 +399,7 @@ function GetSkeleton()
 					</div>
                     <div class="form-group">
                         <label for="functionReturnTypelabel">Function Return Dimension:</label>
-                        <select name="functionReturnDimension" required class="form-control"  id="functionReturnDimension">
+                        <select name="functionReturnDimension" required class="form-control"  id="functionReturnDimension" onChange="seeFunctionSuggestion()">
                             <option value="default" disabled>Select Return Dimension</option>
                         </select> 
                         <!--<input type="text" class="form-control" name="functionReturnType"  placeholder="Enter Function Return Type (int)" id='functionReturnTypeInput' onChange="changeClassName(this)">-->
