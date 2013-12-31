@@ -31,10 +31,12 @@ $(document).ready(function()
 			var div_checkbox=$("#language_checkbox").html("");
 			var select_functionReturnType=$("#functionReturnType").html(new Option("Select Function Return Type","default"));
 			var functionReturnDimension=$("#functionReturnDimension").html(new Option("Select Function Return Dimension","default"));
+			$("#functionReturnSuggestionDiv").html('');
 			var language=javascriptObject.language;
 			for(i=0;i<language.length;i++)
 			{
 				div_checkbox.append('<input type="checkbox" name="language[]" value="'+language[i].name+'" id="checkbox_'+language[i].name+'" checked onChange="onSelect(this)">'+language[i].name+'<br>');
+				$("#functionReturnSuggestionDiv").append('<select name="'+language[i].name+'functionReturnSuggestion" required class="form-control"  id="'+language[i].name+'functionReturnSuggestion"><option value="default" disabled>Select Suggestion in '+language[i].name+'</option></select><br>');
 				select_functionReturnType.append('<option value="'+language[i].type[i].name+'" >'+language[i].type[i].name+'</option>');
 			}
 			itr=language[0].type[0].dimension.length;
@@ -104,6 +106,33 @@ function seeFunctionSuggestion()
 		alert("Please Select Function Return Dimension");
 		functionReturnDimension.focus();
 		return
+	}
+	var i=0,j=0;
+	var  language=$("[name='language[]']");
+	var len=language.length;
+	for(i=0;i<len;i++)
+	{
+		if(language.get(i).checked==true)
+		{
+			checkedLanguage[j]=language.get(i).value;
+			j++;
+		}
+	}
+	var suggestions=SuggestionFunction(javascriptObject,checkedLanguage,' ',functionReturnType.val(),functionReturnDimension.val());
+	$('#functionReturnSuggestionDiv').show();
+	for(i=0;i<checkedLanguage.length;i++)
+	{
+		if(typeof suggestions[checkedLanguage[i]] == 'string' )
+		{
+			$('#'+checkedLanguage[i]+'functionReturnSuggestion').append('<option value="'+suggestions[checkedLanguage[i]]+'">'+suggestions[checkedLanguage[i]]+'</option>');
+		}
+		else
+		{
+			for(j=0;j<suggestions[checkedLanguage[i]].length;j++)
+			{
+				$('#'+checkedLanguage[i]+'functionReturnSuggestion').append('<option value="'+suggestions[checkedLanguage[i]][j]+'">'+suggestions[checkedLanguage[i]][j]+'</option>');
+			}
+		}
 	}
 }
 function checkCompulsory()
@@ -250,14 +279,14 @@ function SuggestionFunction(json,language,var_name,var_type,dimension)
 					var test_array=json.language[i].type[j].dimension[dimension].suggestion;
 					if(typeof test_array == 'string')
 					{
-						test_array=test_array.replace("test",var_name)
+						test_array=test_array.replace("test",var_name);
 					}
 					else
 					{
 						var itr=0;
 						for(itr=0;itr<test_array.length;itr++)
 						{
-							test_array[itr]=test_array[itr].replace("test",var_name)
+							test_array[itr]=test_array[itr].replace("test",var_name);
 						}
 					}
 					suggestion[language[i]]=test_array;
@@ -314,6 +343,7 @@ function GetSkeleton()
 		var i=0,j=0;
 		var noLanguageChecked=checkedLanguage.length;
 		var suggestionsArray='';
+		var functionSuggestion='';
 		for(i=0;i<noLanguageChecked;i++)
 		{
 			var temp=new Array();
@@ -321,13 +351,12 @@ function GetSkeleton()
 			{
 				temp[j]=$("#"+checkedLanguage[i]+'CodeSuggestionVariable'+j).val();
 			}			
-			suggestionsArray=suggestionsArray+'&'+checkedLanguage[i]+'variables='+JSON.stringify(temp);			
+			suggestionsArray=suggestionsArray+'&'+checkedLanguage[i]+'variables='+JSON.stringify(temp);	
+			functionSuggestion=functionSuggestion+'&'+checkedLanguage[i]+'functionReturnSuggestion='+$('#'+checkedLanguage[i]+'functionReturnSuggestion').val();		
 		}
 		var functionName=$('#functionNameInput').val();
-		var functionReturnType=$('#functionReturnType').val();
-		var functionReturnDimension=$('#functionReturnDimension').val();
 		//here for java i am checking if classname exists or not so using hardcoded values
-		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+"&functionReturnType="+functionReturnType+"&functionReturnDimension="+functionReturnDimension;// parametes passed to php files. variables are passed the form langNamevariables=arr[]
+		var params="language="+JSON.stringify(checkedLanguage)+"&functionName="+functionName+suggestionsArray+functionSuggestion+"&functionReturnType="+functionReturnType;// parametes passed to php files. variables are passed the form langNamevariables=arr[]
 		if($('#checkbox_JAVA').prop('checked'))params=params+'&className='+$('#classNameInput').val();		
 		var xmlhttp=$.ajax({
 			url:"backend.php",
@@ -402,7 +431,9 @@ function GetSkeleton()
                         <select name="functionReturnDimension" required class="form-control"  id="functionReturnDimension" onChange="seeFunctionSuggestion()">
                             <option value="default" disabled>Select Return Dimension</option>
                         </select> 
-                        <!--<input type="text" class="form-control" name="functionReturnType"  placeholder="Enter Function Return Type (int)" id='functionReturnTypeInput' onChange="changeClassName(this)">-->
+					</div>
+                    <div class="form-group" id="functionReturnSuggestionDiv" style="display:none;">
+                        <label for="functionReturnSuggestionlabel">Function Return Suggestion:</label>
 					</div>
                     <div class="form-group" id="numArg">
                         <label for="numArglabel">Number of Input Arguments:</label>
