@@ -1,0 +1,111 @@
+XYZ has an internal tool to host programming contests in the C and Java languages only.
+
+In our programming contest, a problem statement has two aspects to it -
+
+a. A worded problem -
+Like in topcoder.com (please visit their site to see how its done if you are not aware of it), we display a worded algorithmic problem.
+
+It has a function definition to be coded by the User.
+
+b. A text-box to write source code -
+
+A text box with some basic pre-written code (default source code) about the problem statement is provided where the User may write his/her code.
+
+For e.g. a worded problem may be -
+
+" Ram has just learned to code and wants to know how to sort an array of N numbers. Help him.
+
+The function signature would be int sort_arr(int* arr, int n)
+
+"
+
+and the text box will contain the following default source code -
+"
+
+#include <stdio.h>
+
+int sort(int* arr, int n){
+
+     // write your code here
+
+}
+
+"
+
+This above information would change if the programming language were Java -
+
+"
+
+public class Sort{
+
+  public int sort(ArrayList arr){
+
+     // write your code here
+
+  }
+}
+
+"
+
+Your task -
+
+You are creating an internal tool which would automatically create the default source code seen above, given the information of the problem statement through a user interface.
+
+Let's call the person who would be using this tool to add data as the content_provider.
+
+There would be two sides you would be dealing with -
+
+a. Input side - contains the UI to accept information from the content_provider
+
+File name: input.html
+
+b. Processing side - A PHP script to analyze the input, process it and return data back to the Input side.
+
+File name: backend.php
+
+Inputs -
+
+You will accept the following information through your input form -
+
+1. Name of the function
+
+2. Name of the class (applicable only for Java)
+
+3. Number of input arguments.
+
+Based on the number of input arguments, you shall accept the following information for each argument -
+4. Variable name (var_name)
+
+5. Basic data type of the argument (type):
+For now, this can only be an "integer". If you are done with this task within the time frame expected, you could add the feature for the "char"  data-type.
+
+6. Dimensionality of the argument (dim):
+
+If dim = 0, it means it is just a basic data-type.
+
+If dim = 1, it means its a 1-D array of the basic data type provided.
+
+If dim = 2, it means its a 1-D array of the basic data type provided.
+
+Assume that dim can only take 3 values: 0,1,2.
+
+Based on these two pieces of information, your interface should generate all possible options that could be used separately for the two possible languages - C and Java.
+
+Note - not all arguments may be applicable in all the languages. You should capture this requirement through a convenient feature in your form.
+
+For e.g., var_name = arr, type = "integer" and dim = 1 for the above example of sorting a list. The suggestions generated should be -
+
+For C:
+
+int* arr   or   int arr[ ]
+
+For Java
+
+int[ ]  arr   or   ArrayList arr  or  Set<Integer> arr
+
+or any other representation which can store a list of numbers.
+
+Based on the suggestions provided by you, the content_provider would select an appropriate suggestion and confirm it and proceed with the same process for the other arguments.
+
+You could use jquery (http://jquery.com/) to provide an intuitive interface for suggestions and their selection. 
+If you are okay with AJAX etc. feel free to use it. There's no restriction on the technology.
